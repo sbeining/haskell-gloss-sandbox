@@ -14,7 +14,7 @@ main = do
     update _ = next
 
 initial :: Ball
-initial = Ball 300 (-300) 300 0
+initial = Ball 300 (-300) 300 0 1
 
 draw :: Ball -> Picture
 draw ball = translate (x ball) (y ball) $ color white $ circleSolid 20
