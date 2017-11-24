@@ -9,8 +9,12 @@ g = 10
 
 main :: IO ()
 main = do
-    simulate FullScreen black 60 initial draw update
+    simulate window background fps initial render update
   where
+    window = FullScreen
+    background = black
+    fps = 60
+    render = draw
     update _ = next
 
 initial :: Ball
