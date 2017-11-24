@@ -2,14 +2,10 @@ module Main where
 
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Environment
-
-type Ball = (Float, Float, Float, Float)
+import Ball
 
 g :: Float
 g = 10
-
-bounce :: Float
-bounce = 1
 
 main :: IO ()
 main = do
@@ -18,24 +14,22 @@ main = do
     update _ = next
 
 initial :: Ball
-initial = (300, -300, 300, 0)
+initial = Ball 300 (-300) 300 0
 
 draw :: Ball -> Picture
-draw (x, y, _, _) = translate x y $ color white $ circleSolid 20
+draw ball = translate (x ball) (y ball) $ color white $ circleSolid 20
 
 next :: Float -> Ball -> Ball
-next dt = accelerate . (move dt) . collision
+next dt = accelerateY (-g) . (move dt) . collision
 
 collision :: Ball -> Ball
-collision (x, y, dx, dy)
-  | y <= -430  = (x, y, dx, -dy * bounce)
-  | x <= -700 = (x, y, -dx * bounce, dy)
-  | y >= 430 = (x, y, dx, -dy * bounce)
-  | x >= 700 = (x, y, -dx * bounce, dy)
-  | otherwise = (x, y, dx, dy)
+collision ball
+  | y ball <= -430  = bounceY ball
+  | x ball <= -700 = bounceX ball
+  | y ball >= 430 = bounceY ball
+  | x ball >= 700 = bounceX ball
+  | otherwise = ball
 
-accelerate :: Ball -> Ball
-accelerate (x, y, dx, dy) = (x, y, dx, dy - g)
 
 move :: Float -> Ball -> Ball
-move dt (x, y, dx, dy) = (x + dx * dt, y + dy * dt, dx, dy)
+move dt ball = (moveX (dx ball * dt)) (moveY (dy ball * dt) ball)

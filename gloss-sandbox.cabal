@@ -16,6 +16,7 @@ cabal-version:       >=1.10
 executable ball-bounce
   hs-source-dirs:      app
   main-is:             Main.hs
+  other-modules:       Ball
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , gloss
