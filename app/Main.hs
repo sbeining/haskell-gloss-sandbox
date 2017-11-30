@@ -1,15 +1,19 @@
 module Main where
 
+import Data.Bifunctor
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Environment
 import Ball
+import Wall
 
 g :: Float
 g = 10
 
 main :: IO ()
 main = do
-    simulate window background fps initial render update
+    (width, height) <- getScreenSize
+    let initialState = initial width height
+    simulate window background fps initialState render update
   where
     window = FullScreen
     background = black
@@ -17,23 +21,26 @@ main = do
     render = draw
     update _ = next
 
-initial :: Ball
-initial = Ball 300 (-300) 300 0 1
+initial :: Int -> Int -> (Room, Ball)
+initial width height = do
+  let room = roomFromWidthHeight (fromIntegral width) (fromIntegral height)
+  let ball = Ball 300 (-300) 300 0 1
 
-draw :: Ball -> Picture
-draw ball = translate (x ball) (y ball) $ color white $ circleSolid 20
+  (room, ball)
 
-next :: Float -> Ball -> Ball
-next dt = accelerateY (-g) . (move dt) . collision
+draw :: (Room, Ball) -> Picture
+draw (_, ball) = translate (x ball) (y ball) $ color white $ circleSolid 20
 
-collision :: Ball -> Ball
-collision ball
-  | y ball <= -430  = bounceY ball
-  | x ball <= -700 = bounceX ball
-  | y ball >= 430 = bounceY ball
-  | x ball >= 700 = bounceX ball
-  | otherwise = ball
+next :: Float -> (Room, Ball) -> (Room, Ball)
+next dt = second (accelerateY (-g) . move dt) . collision
 
+collision :: (Room, Ball) -> (Room, Ball)
+collision (room, ball)
+  | y ball <= roomFloor room + 20 = (room, bounceY ball)
+  | x ball <= roomLeft room + 20 = (room, bounceX ball)
+  | y ball >= roomCeiling room - 20 = (room, bounceY ball)
+  | x ball >= roomRight room - 20 = (room, bounceX ball)
+  | otherwise = (room, ball)
 
 move :: Float -> Ball -> Ball
-move dt ball = (moveX (dx ball * dt)) (moveY (dy ball * dt) ball)
+move dt ball = (moveX $ dx ball * dt) $ (moveY $ dy ball * dt) ball
