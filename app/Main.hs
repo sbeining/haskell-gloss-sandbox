@@ -29,7 +29,18 @@ initial width height = do
   (room, ball)
 
 draw :: (Room, Ball) -> Picture
-draw (_, ball) = translate (x ball) (y ball) $ color white $ circleSolid 20
+draw (room, ball) = pictures [drawBall ball, drawData ball]
+
+drawBall :: Ball -> Picture
+drawBall ball = translate (x ball) (y ball) $ color white $ circleSolid 20
+
+drawData :: Ball -> Picture
+drawData ball = color white $ pictures
+    [ translate (-720) (350) . text $ "x: " ++ show (x ball)
+    , translate (-720) (250) . text $ "y: " ++ show (y ball)
+    , translate (-720) (150) . text $ "dx: " ++ show (dx ball)
+    , translate (-720) (50) . text $ "dy: " ++ show (dy ball)
+    ]
 
 next :: Float -> (Room, Ball) -> (Room, Ball)
 next dt = second (accelerateY (-g) . move dt) . collision
