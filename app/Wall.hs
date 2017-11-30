@@ -14,9 +14,9 @@ data Room = Room
 
 roomFromWidthHeight :: Float -> Float -> Room
 roomFromWidthHeight width height = do
-  let left = (-width) / 2
+  let left = (-width) / 2 + 1
   let right = width / 2
-  let top = height / 2
+  let top = height / 2 - 1
   let bottom = (-height) / 2
 
   Room
